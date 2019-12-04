@@ -80,8 +80,8 @@ class Tracker(object):
 
         iou_matrix = iou_mat(active_tracks_bboxes, detection_bboxes)
 
-        dist_matrix = np.asarray(list(map(lambda x: distance_feature_between_track_and_detection(track=x[0], detection=x[1]), product(self.active_tracks, detections))))
-
+        dist_matrix = np.asarray(list(map(lambda x: distance_feature_between_track_and_detection(track=x[0], detection=x[1]), product(self.active_tracks, detections)))).reshape(len(self.active_tracks), len(detections))
+        #print(dist_matrix.shape)
         iou_mask = np.greater_equal(iou_matrix, self.reid_iou_threshold)
 
         neg_iou_mask = ~iou_mask
@@ -116,7 +116,7 @@ class Tracker(object):
             dist = track.compute_distance(detection.feature)
             return dist
 
-        dist_matrix = np.asarray(list(map(lambda x: distance_feature_between_track_and_detection(track=x[0], detection=x[1]), product(self.inactive_tracks, detections))))
+        dist_matrix = np.asarray(list(map(lambda x: distance_feature_between_track_and_detection(track=x[0], detection=x[1]), product(self.inactive_tracks, detections)))).reshape(len(self.inactive_tracks), len(detections))
 
         row_ind, col_ind = linear_sum_assignment(dist_matrix)
 
@@ -142,17 +142,17 @@ class Tracker(object):
             self.inactive_tracks.remove(t)
 
         #return matched_tracks, unmatched_detections
-        return matched_tracks, unmatched_detections
+        return unmatched_detections
 
     def motion_step(self, track):
-        track.bbox = track.bbox + track.traject_vel[-1] * (time.time() - track.time_stamp[-1]) * 1000
+        track.bbox = track.bbox + track.traject_vel[-1] * (time.time() - track.time_stamp[-1]) / 1000
 
     def motion(self):
         for t in self.active_tracks:
             last_bbox = t.traject_pos
             moments = t.time_stamp
-
-            vs = np.asarray([1000 * (p2 - p1) / (t2 - t1) for p1, p2, t1, t2 in zip(last_bbox, last_bbox[1:], moments, moments[1:])], dtype=np.float)
+            #print(last_bbox, moments, type(last_bbox), type(moments))
+            vs = np.asarray([1000 * (p2 - p1) / (t2 - t1) for p1, p2, t1, t2 in zip(list(last_bbox), list(last_bbox)[1:], list(moments), list(moments)[1:])], dtype=np.float)
             vs = np.mean(vs)
 
             t.traject_vel.append(vs)
@@ -160,47 +160,64 @@ class Tracker(object):
             self.motion_step(t)
 
     def step(self, detections):
-
+        #print(len(self.active_tracks))
+        print("Step")
         for t in self.active_tracks:
-            t.traject_pos.append(copy.deepcopy(t.bbox))
+            if len(t.traject_pos) > 1:
+                t.traject_pos.append(copy.deepcopy(t.bbox))
+            else:
+                pass
 
-        self.motion()
+        #self.motion()
 
         if len(self.active_tracks) > 0 and len(detections) > 0:
             unmatched_active_tracks, unmatched_detections = self.match_reid_iou_sim(detections)
 
             if len(unmatched_detections) > 0:
                 if len(self.inactive_tracks) > 0:
+                    print("1")
                     unmatched_detections = self.match_reid_sim(unmatched_detections)
                 else:
+                    print("2")
                     pass
             else:
+                print("3")
                 pass
 
             if len(unmatched_active_tracks) > 0:
+                print("4")
                 self.tracks_to_inactive(unmatched_active_tracks)
             else:
+                print("5")
                 pass
 
             if len(unmatched_detections) > 0:
+                print("6")
                 self.add_new_tracks(unmatched_detections)
             else:
+                print("7")
                 pass
 
         elif len(self.active_tracks) > 0 and len(detections) == 0:
+            print("8")
             self.tracks_to_inactive(self.active_tracks)
 
         elif len(self.active_tracks) == 0 and len(detections) > 0:
             if len(self.inactive_tracks) > 0:
+                print("9")
                 unmatched_detections = self.match_reid_sim(detections)
                 if len(unmatched_detections) > 0:
+                    print("10")
                     self.add_new_tracks(unmatched_detections)
                 else:
+                    print("11")
                     pass
             else:
+                print("12")
                 self.add_new_tracks(detections)
 
         else:
+            print("13")
             pass
 
         remove_inactive = []

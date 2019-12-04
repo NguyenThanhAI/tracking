@@ -33,6 +33,7 @@ class Detector(object):
 
     def __call__(self, frame):
         height, width = frame.shape[:2]
+        #print(height, width)
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_bgr_expanded = np.expand_dims(frame_bgr, 0)
 
@@ -54,10 +55,11 @@ class Detector(object):
             x_max = int(box[3] * width)
             boxes.append([x_min, y_min, x_max - x_min + 1, y_max - y_min + 1])
             scores.append(score)
-
-        features = self.reid_model(frame_bgr, boxes).tolist()
+        #print(boxes)
+        features = list(self.reid_model(frame_bgr, boxes))
         detections = []
         for box, score, feature in zip(boxes, scores, features):
             detections.append(Detection(to_ltrb(box), score, feature))
+            #print(to_ltrb(box))
 
         return detections
