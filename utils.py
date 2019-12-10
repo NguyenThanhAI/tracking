@@ -9,6 +9,7 @@ def to_ltrb(box):
 
 
 def bb_intersection_over_union(boxA, boxB):
+    #print(boxA, boxB)
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
@@ -25,6 +26,7 @@ def bb_intersection_over_union(boxA, boxB):
 
 
 def iou_mat(list_boxA, list_boxB):
+    print(list_boxA, list_boxB)
     iou_matrix = list(map(lambda x: bb_intersection_over_union(x[0], x[1]), product(list_boxA, list_boxB)))
 
     iou_matrix = np.asarray(iou_matrix, dtype=np.float32).reshape(len(list_boxA), len(list_boxB))

@@ -7,7 +7,7 @@ from tracker import Tracker
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--video_source", default=r"C:\Users\Thanh\Downloads\vinhphuc_cam02.stream_2019-11-03-06.42.05.890.mp4", type=str)
+parser.add_argument("--video_source", default=r"C:\Users\Thanh\Downloads\vinhphuc_cam04.stream_2019-11-03-06.42.24.538.mp4", type=str)
 parser.add_argument("--object_detector_model_dir", default=r"E:\PythonProjects\MeatDeli_Pedestrian_Detection\Object_Detection_Inference\ssd_resnet50_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03", type=str)
 parser.add_argument("--path_to_reid_model", default=r"E:\PythonProjects\MeatDeli_Pedestrian_Detection\tracking_without_bells_and_whistles\mars-small128.pb", type=str)
 parser.add_argument("--detection_person_thresh", default=0.4, type=float)
@@ -57,10 +57,10 @@ while True:
         cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 255, 255), 1)
         cv2.putText(img, "Id:" + str(id), (bbox[0], bbox[1]), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color=(255, 255, 255), thickness=1)
 
-    #for detection in detections:
-    #    bbox = detection.bbox
-    #    #print(bbox)
-    #    cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0), 1)
+    for detection in detections:
+        bbox = detection.bbox
+        #print(bbox)
+        cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0), 1)
 
     cv2.imshow("", img)
     cv2.waitKey(1)

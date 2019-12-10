@@ -45,9 +45,9 @@ class Tracker(object):
         self.track_num += num_new
 
     def get_active_bboxes(self):
-        if len(self.active_tracks) == 1:
-            bboxes = self.active_tracks[0].bbox
-        elif len(self.active_tracks) > 1:
+        #if len(self.active_tracks) == 1:
+        #    bboxes = list(self.active_tracks[0].bbox)
+        if len(self.active_tracks) >= 1:
             bboxes = [t.bbox for t in self.active_tracks]
         else:
             bboxes = []
@@ -55,9 +55,9 @@ class Tracker(object):
         return bboxes
 
     def get_active_scores(self):
-        if len(self.active_tracks) == 1:
-            scores = self.active_tracks[0].score
-        elif len(self.active_tracks) > 1:
+        #if len(self.active_tracks) == 1:
+        #    scores = self.active_tracks[0].score
+        if len(self.active_tracks) >= 1:
             scores = [t.score for t in self.active_tracks]
         else:
             scores = []
@@ -175,49 +175,49 @@ class Tracker(object):
 
             if len(unmatched_detections) > 0:
                 if len(self.inactive_tracks) > 0:
-                    print("1")
+                    #print("1")
                     unmatched_detections = self.match_reid_sim(unmatched_detections)
                 else:
-                    print("2")
+                    #print("2")
                     pass
             else:
-                print("3")
+                #print("3")
                 pass
 
             if len(unmatched_active_tracks) > 0:
-                print("4")
+                #print("4")
                 self.tracks_to_inactive(unmatched_active_tracks)
             else:
-                print("5")
+                #print("5")
                 pass
 
             if len(unmatched_detections) > 0:
-                print("6")
+                #print("6")
                 self.add_new_tracks(unmatched_detections)
             else:
-                print("7")
+                #print("7")
                 pass
 
         elif len(self.active_tracks) > 0 and len(detections) == 0:
-            print("8")
+            #print("8")
             self.tracks_to_inactive(self.active_tracks)
 
         elif len(self.active_tracks) == 0 and len(detections) > 0:
             if len(self.inactive_tracks) > 0:
-                print("9")
+                #print("9")
                 unmatched_detections = self.match_reid_sim(detections)
                 if len(unmatched_detections) > 0:
-                    print("10")
+                    #print("10")
                     self.add_new_tracks(unmatched_detections)
                 else:
-                    print("11")
+                    #print("11")
                     pass
             else:
-                print("12")
+                #print("12")
                 self.add_new_tracks(detections)
 
         else:
-            print("13")
+            #print("13")
             pass
 
         remove_inactive = []
